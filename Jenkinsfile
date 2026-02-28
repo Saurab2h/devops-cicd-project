@@ -3,6 +3,7 @@ pipeline {
 
     environment {
         DOCKER_IMAGE = "saurab2h/devops-app"
+        DOCKER_CREDENTIALS_ID = "dockerhub-creds"
     }
 
     stages {
@@ -10,6 +11,18 @@ pipeline {
         stage('Checkout') {
             steps {
                 checkout scm
+            }
+        }
+
+        stage('Docker Login') {
+            steps {
+                withCredentials([usernamePassword(
+                    credentialsId: DOCKER_CREDENTIALS_ID,
+                    usernameVariable: 'DOCKER_USER',
+                    passwordVariable: 'DOCKER_PASS'
+                )]) {
+                    sh 'echo $DOCKER_PASS | docker login -u $DOCKER_USER --password-stdin'
+                }
             }
         }
 
